@@ -18,16 +18,27 @@ def chooseInitialPosition(count):
     return None
 
 
-def response(response, configuration, location):
-    print("===============" + location)
-    if response == "Limpando A.":
-        configuration[0] = "Clean"
-    elif response == "Limpando B.":
-        configuration[1] = "Clean"
-    elif response == "Left" or response == "Right":
-        location == response
+def response(response, configuration, state,  location):
+    punctuation = 0
+    if response == "Limpando A." or response == "Limpando B.":
+        if response == "Limpando A.":
+            configuration[0] = "Clean"
+            state[0] = "Clean"
 
-    return [configuration, location]
+        elif response == "Limpando B.":
+            configuration[1] = "Clean"
+            state[1] = "Clean"
+
+        punctuation = punctuation + 5
+    else:
+        if location == "Right" and configuration[1] == "Clean":
+            state[1] = "Clean"
+        elif location == "Left" and configuration[1] == "Clean":
+            state[0] = "Clean"
+        location = moveAgent(location)
+        punctuation = punctuation - 1
+
+    return [configuration, state, location, punctuation]
 
 
 def actionAgent(configuration, location):
@@ -35,27 +46,37 @@ def actionAgent(configuration, location):
         if act(configuration[0]) == "Suck":
             return "Limpando A."
         else:
-
-            return moveAgent(location)
+            return None
     elif location == "Right":
         if act(configuration[1]) == "Suck":
             return "Limpando B."
         else:
-            return moveAgent(location)
+            return None
 
 
 def act(status):
     if status == "Dirty":
-        print("Limpando")
+        print("->LIMPANDO")
         return "Suck"
     return None
 
 
 def moveAgent(location):
     if location == "Right":
-        print("ANDANDO PARA A ESQUERDA")
+        print("-> ANDANDO PARA A ESQUERDA")
         return "Left"
     elif location == "Left":
-        print("ANDANDO PARA A DIREITA")
+        print("-> ANDANDO PARA A DIREITA")
         return "Right"
     return None
+
+
+def resetConfigurations():
+    return [["Dirty", "Dirty"], ["Dirty", "Clean"],
+            ["Clean", "Dirty"], ["Clean", "Clean"]]
+
+
+def printInfo(configuration, location, i, state=["", ""]):
+    print(
+        f"POSIÇÃO: {location}\t   CONFIGURAÇÃO: [{configuration[i][0]}][{configuration[i][1]}]", end="")
+    print(f"   ESTADO (MEMÓRIA) : [{state[0]} , {state[1]}]")

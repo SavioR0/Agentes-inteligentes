@@ -1,20 +1,52 @@
 import functions
 
-
 punctuation = [0, 0, 0, 0, 0, 0, 0, 0]
 
-location = "Left"
+locations = ["Left", "Right"]
 
-configuration = ["Dirty", "Dirty"]
+configuration = [["Dirty", "Dirty"], ["Dirty", "Clean"],
+                 ["Clean", "Dirty"], ["Clean", "Clean"]]
 
-print(
-    f"POSIÇÃO: {location}  CONFIGURAÇÃO: [{configuration[0]}][{configuration[1]}]")
+state = ["", ""]
 
-for i in range(4):
-    response = functions.response(functions.actionAgent(
-        configuration, location), configuration, location)
-    print(response[1])
-    location = response[1]
-    configuration = response[0]
-    print(
-        f"POSIÇÃO: {location} CONFIGURAÇÃO :[{configuration[0]}][{configuration[1]}]")
+j = 0
+while j <= 1:
+
+    i = 0
+    while i <= 3:
+        location = locations[j]
+
+        print(
+            "--------------------------------------------------------------------------------------")
+        functions.printInfo(configuration, location, i)
+        print(
+            "--------------------------------------------------------------------------------------")
+
+        response = functions.response(functions.actionAgent(
+            configuration[i], location), configuration[i], state, location)
+        location = response[2]
+        configuration[i] = response[0]
+        state = response[1]
+        punctuation[(4*j+i)] = punctuation[(4*j+i)] + response[3]
+        functions.printInfo(configuration, location, i, state)
+
+        while state != ["Clean", "Clean"]:
+            response = functions.response(functions.actionAgent(
+                configuration[i], location), configuration[i], state, location)
+            location = response[2]
+            configuration[i] = response[0]
+            state = response[1]
+            punctuation[(4*j+i)] = punctuation[(4*j+i)] + response[3]
+
+            functions.printInfo(configuration, location, i, state)
+
+        print(
+            f"-------------------------------- PONTUAÇÃO : {punctuation[(4*j+i)]}  -------------------------------------", end="\n\n\n\n")
+        i = i + 1
+        state = ["", ""]
+
+    configuration = functions.resetConfigurations()
+    j = j + 1
+
+print("\tTODAS AS PONTUAÇÕES : ", end="")
+print(punctuation, end="\n\n")
